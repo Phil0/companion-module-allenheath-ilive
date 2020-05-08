@@ -129,9 +129,10 @@ module.exports = {
 					choices: this.CHOICES_INPUT_CHANNEL
 				}]
 		};
-
+		
+		// TODO: Warum input labels? nur 250 bei iLive als eigenes? 
 		actions['scene_recall_256'] = {
-				label: 'Scene recall 129-256',
+				label: 'Scene recall 129-250',
 				options: [{
 					type: 'dropdown',
 					label: 'Scene number',
@@ -141,6 +142,7 @@ module.exports = {
 				}]
 		};
 
+		/* nur bis 250
 		actions['scene_recall_384'] = {
 				label: 'Scene recall 257-384',
 				options: [{
@@ -162,6 +164,8 @@ module.exports = {
 					choices: this.CHOICES_INPUT_CHANNEL_500
 				}]
 		};
+
+		*/
 		return actions;
 	}
 }

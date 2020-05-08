@@ -32,13 +32,19 @@ class instance extends instance_skel {
 		this.encoders     = [];
 		this.CHOICES_LIST = [];
 		this.CHOICES_INPUT_CHANNEL = [];
+		/*
 		this.CHOICES_INPUT_CHANNEL_256 = [];
 		this.CHOICES_INPUT_CHANNEL_384 = [];
 		this.CHOICES_INPUT_CHANNEL_500 = [];
+		*/
 
-		for (var i = 1; i < 129; i++) {
-			this.CHOICES_INPUT_CHANNEL.push({ label: i, id: i-1 });
+		//Input 1-64
+		var j=0x20; //Start Imputs bei HEX 20
+		for (var i = 1; i < 65; i++) {
+			this.CHOICES_INPUT_CHANNEL.push({ label: i, id: j});
+			j++;
 		}
+		/*
 		for (var i = 129; i < 257; i++) {
 			this.CHOICES_INPUT_CHANNEL_256.push({ label: i, id: i-1 });
 		}
@@ -48,21 +54,23 @@ class instance extends instance_skel {
 		for (var i = 385; i < 501; i++) {
 			this.CHOICES_INPUT_CHANNEL_500.push({ label: i, id: i-1 });
 		}
+		*/
 
-
+		// DCA 1-16
 		this.CHOICES_DCA_ON_CHANNEL = [];
 		var j = 0x40;
-		for (var i = 1; i < 25; i++) {
+		for (var i = 1; i < 17; i++) {
 			this.CHOICES_DCA_ON_CHANNEL.push({ label: i, id: j });
 			j++;
 		}
 
 		this.CHOICES_DCA_OFF_CHANNEL = [];
 		var j = 0x00;
-		for (var i = 1; i < 25; i++) {
+		for (var i = 1; i < 17; i++) {
 			this.CHOICES_DCA_OFF_CHANNEL.push({ label: i, id: j });
 			j++;
 		}
+
 
 		this.CHOICES_COLOR = [
 			{ label: 'off', id: 0x00 },
@@ -72,7 +80,7 @@ class instance extends instance_skel {
 			{ label: 'Blue', id: 0x04 },
 			{ label: 'Purple', id: 0x05 },
 			{ label: 'Lt Blue', id: 0x06 },
-			{ label: 'White', id: 0x07 }
+			//{ label: 'White', id: 0x07 } //kein White
 		];
 
 		Object.assign(this, {
@@ -121,30 +129,35 @@ class instance extends instance_skel {
 
 		switch (id) {
 
+			//Angepasst
 			case 'mute_input':
 				if (opt.mute == 'mute_on') {
-					cmd = new Buffer([ 0x90 + 0, channel, 0x7f, 0x90 + 0, channel, 0x00 ]);
+					cmd = new Buffer([ 0x90 + 0, channel, 0x7f, channel, 0x00 ]);
 				} else {
-					cmd = new Buffer([ 0x90 + 0, channel, 0x3f, 0x90 + 0, channel, 0x00 ]);
+					cmd = new Buffer([ 0x90 + 0, channel, 0x3f, channel, 0x00 ]);
 				}
 				break;
-
+			
+			//Angepasst
 			case 'main_assignment':
 				if (opt.main_mix == 'on') {
-					cmd = new Buffer([ 0xB0 + 0, 0x63, channel, 0xB0 + 0, 0x62, 0x18, 0xB0 + 0, 0x06, 0x7F ]);
+					cmd = new Buffer([ 0xB0 + 0, 0x63, channel, 0x62, 0x18, 0x06, 0x7F ]);
 				} else {
-						cmd = new Buffer([ 0xB0 + 0, 0x63, channel, 0xB0 + 0, 0x62, 0x18, 0xB0 + 0, 0x06, 0x3F ]);
+					cmd = new Buffer([ 0xB0 + 0, 0x63, channel, 0x62, 0x18, 0x06, 0x3F ]);
 				}
 				break;
-
+			
+				//TODO: DCA chacnnel nr checken 
 			case 'dca_assignment_on':
-				cmd = new Buffer([ 0xB0 + 0, 0x63, channel, 0xB0 + 0, 0x62, 0x40, 0xB0 + 0, 0x06, opt.dcaChannel ]);
+				cmd = new Buffer([ 0xB0 + 0, 0x63, channel, 0x62, 0x40, 0x06, opt.dcaChannel ]);
 				break;
 
+				//TODO: DCA chacnnel nr checken 
 			case 'dca_assignment_off':
-				cmd = new Buffer([ 0xB0 + 0, 0x63, channel, 0xB0 + 0, 0x62, 0x40, 0xB0 + 0, 0x06, opt.dcaChannel ]);
+				cmd = new Buffer([ 0xB0 + 0, 0x63, channel, 0x62, 0x40, 0x06, opt.dcaChannel ]);
 				break;
 
+				//Passt, chammel setzen nur
 			case 'channel_name':
 				var syntax = new Buffer([0x00, 0x03, channel]);
 				var name = new Buffer.from(new String(opt.chName));
@@ -152,6 +165,7 @@ class instance extends instance_skel {
 				cmd = Buffer.concat([sysExHeader, syntax, name, end]);
 				break;
 
+				//Passt, farbe setzen
 			case 'channel_color':
 				var syntax = new Buffer([0x00, 0x06]);
 				var color = new Buffer(([channel, opt.channelColor, 0xF7]));
@@ -166,6 +180,7 @@ class instance extends instance_skel {
 				cmd = new Buffer([ 0xB0, 0x00, 0x01, 0xC0, sceneNumber ]);
 				break;
 
+			/* nur 250 scenen
 			case 'scene_recall_384':
 				cmd = new Buffer([ 0xB0, 0x00, 0x02, 0xC0, sceneNumber ]);
 				break;
@@ -173,6 +188,7 @@ class instance extends instance_skel {
 			case 'scene_recall_500':
 				cmd = new Buffer([ 0xB0, 0x00, 0x03, 0xC0, sceneNumber ]);
 				break;
+			*/
 		}
 
 		if (cmd !== undefined) {
@@ -198,7 +214,7 @@ class instance extends instance_skel {
 				id: 'info',
 				width: 12,
 				label: 'Information',
-				value: 'This module is for dLive'
+				value: 'This module is for iLive'
 			},
 			{
 				type: 'textinput',
